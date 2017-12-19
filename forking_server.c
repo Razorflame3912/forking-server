@@ -12,23 +12,26 @@ static void sighandler(int signo) {
 }
 
 int main() {
-  int to_client;
-  int wkp = server_setup();
-  int f = fork();
-  if(!f){
-    subserver(server_handshake(&to_client));
-  }
-  else{
-    wkp = server_setup();
+  signal(SIGINT,sighandler);
+  while(1){
+    int to_client;
+    int wkp = server_setup();
+    int f = fork();
+    if(!f){
+      subserver(wkp);
+    }
+    else{
+    }
   }
 }
 
 void subserver(int from_client) {
   int downstream = server_connect(from_client);
+  char buffer[BUFFER_SIZE];
   while(1){
-    read(from_client, buffer, BUFFER_SIZE);
+    read(from_client, buffer, sizeof(buffer));
     process(buffer);
-    write(downstream,buffer, BUFFER_SIZE);
+    write(downstream,buffer, sizeof(buffer));
   }
   
 }
